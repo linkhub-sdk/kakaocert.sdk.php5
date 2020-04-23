@@ -269,16 +269,52 @@ class KakaocertService
   }
 
   public function getESignResult($ClientCode, $receiptID)
-   {
-       if (is_null($receiptID) || empty($receiptID)) {
-           throw new KakaocertException('관리번호가 입력되지 않았습니다.');
-       }
-       $result = $this->executeCURL('/SignToken/' . $receiptID, $ClientCode);
+  {
+    if (is_null($receiptID) || empty($receiptID)) {
+      throw new KakaocertException('접수아이디가 입력되지 않았습니다.');
+    }
+    $result = $this->executeCURL('/SignToken/' . $receiptID, $ClientCode);
 
-       $ResultESign = new ResultESign();
-       $ResultESign->fromJsonInfo($result);
-       return $ResultESign;
+    $ResultESign = new ResultESign();
+    $ResultESign->fromJsonInfo($result);
+    return $ResultESign;
+  }
+
+  public function requestVerifyAuth($ClientCode, $RequestVerifyAuth)
+  {
+    $postdata = json_encode($RequestVerifyAuth);
+    return $this->executeCURL('/SignIdentity/Request', $ClientCode, null, true, null, $postdata)->receiptId;
+  }
+
+  public function getVerifyAuthResult($ClientCode, $receiptID)
+  {
+      if (is_null($receiptID) || empty($receiptID)) {
+          throw new KakaocertException('접수아이디가 입력되지 않았습니다.');
+      }
+      $result = $this->executeCURL('/SignIdentity/' . $receiptID, $ClientCode);
+
+      $ResultVerifyAuth = new ResultVerifyAuth();
+      $ResultVerifyAuth->fromJsonInfo($result);
+      return $ResultVerifyAuth;
+  }
+
+   public function requestCMS($ClientCode, $RequestCMS)
+   {
+     $postdata = json_encode($RequestCMS);
+     return $this->executeCURL('/SignDirectDebit/Request', $ClientCode, null, true, null, $postdata)->receiptId;
    }
+
+   public function getCMSResult($ClientCode, $receiptID)
+  {
+      if (is_null($receiptID) || empty($receiptID)) {
+          throw new KakaocertException('접수아이디가 입력되지 않았습니다.');
+      }
+      $result = $this->executeCURL('/SignDirectDebit/' . $receiptID, $ClientCode);
+
+      $ResultCMS = new ResultCMS();
+      $ResultCMS->fromJsonInfo($result);
+      return $ResultCMS;
+  }
 } // end of KakaocertService
 
 class KakaocertException extends Exception
@@ -298,6 +334,80 @@ class KakaocertException extends Exception
         return __CLASS__ . ": [{$this->code}]: {$this->message}\n";
     }
 }
+
+class RequestVerifyAuth
+{
+  public $CallCenterNum;
+	public $Expires_in;
+	public $PayLoad;
+	public $ReceiverBirthDay;
+	public $ReceiverHP;
+	public $ReceiverName;
+	public $SubClientID;
+	public $TMSMessage;
+	public $TMSTitle;
+	public $Token;
+	public $isAllowSimpleRegistYN;
+	public $isVerifyNameYN;
+}
+
+class ResultVerifyAuth
+{
+  public $receiptID;
+	public $regDT;
+	public $state;
+	public $receiverHP;
+	public $receiverName;
+	public $receiverBirthday;
+	public $expires_in;
+	public $callCenterNum;
+	public $token;
+	public $allowSimpleRegistYN;
+	public $verifyNameYN;
+	public $payload;
+	public $requestDT;
+	public $expireDT;
+	public $clientCode;
+	public $clientName;
+	public $tmstitle;
+	public $tmsmessage;
+	public $returnToken;
+
+	public $subClientName;
+	public $subClientCode;
+	public $viewDT;
+	public $completeDT;
+	public $verifyDT;
+
+  public function fromJsonInfo($jsonInfo)
+  {
+    isset($jsonInfo->receiptID) ? $this->receiptID = $jsonInfo->receiptID : null;
+    isset($jsonInfo->regDT) ? $this->regDT = $jsonInfo->regDT : null;
+    isset($jsonInfo->state) ? $this->state = $jsonInfo->state : null;
+    isset($jsonInfo->receiverHP) ? $this->receiverHP = $jsonInfo->receiverHP : null;
+    isset($jsonInfo->receiverName) ? $this->receiverName = $jsonInfo->receiverName : null;
+    isset($jsonInfo->receiverBirthday) ? $this->receiverBirthday = $jsonInfo->receiverBirthday : null;
+    isset($jsonInfo->expires_in) ? $this->expires_in = $jsonInfo->expires_in : null;
+    isset($jsonInfo->callCenterNum) ? $this->callCenterNum = $jsonInfo->callCenterNum : null;
+    isset($jsonInfo->token) ? $this->token = $jsonInfo->token : null;
+    isset($jsonInfo->allowSimpleRegistYN) ? $this->allowSimpleRegistYN = $jsonInfo->allowSimpleRegistYN : null;
+    isset($jsonInfo->verifyNameYN) ? $this->verifyNameYN = $jsonInfo->verifyNameYN : null;
+    isset($jsonInfo->payload) ? $this->payload = $jsonInfo->payload : null;
+    isset($jsonInfo->requestDT) ? $this->requestDT = $jsonInfo->requestDT : null;
+    isset($jsonInfo->expireDT) ? $this->expireDT = $jsonInfo->expireDT : null;
+    isset($jsonInfo->clientCode) ? $this->clientCode = $jsonInfo->clientCode : null;
+    isset($jsonInfo->clientName) ? $this->clientName = $jsonInfo->clientName : null;
+    isset($jsonInfo->tmstitle) ? $this->tmstitle = $jsonInfo->tmstitle : null;
+    isset($jsonInfo->tmsmessage) ? $this->tmsmessage = $jsonInfo->tmsmessage : null;
+    isset($jsonInfo->returnToken) ? $this->returnToken = $jsonInfo->returnToken : null;
+    isset($jsonInfo->subClientName) ? $this->subClientName = $jsonInfo->subClientName : null;
+    isset($jsonInfo->subClientCode) ? $this->subClientCode = $jsonInfo->subClientCode : null;
+    isset($jsonInfo->viewDT) ? $this->viewDT = $jsonInfo->viewDT : null;
+    isset($jsonInfo->completeDT) ? $this->completeDT = $jsonInfo->completeDT : null;
+    isset($jsonInfo->verifyDT) ? $this->verifyDT = $jsonInfo->verifyDT : null;
+  }
+}
+
 
 class RequestESign
 {
