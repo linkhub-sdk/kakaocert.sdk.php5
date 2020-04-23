@@ -265,7 +265,7 @@ class KakaocertService
   public function requestESign($ClientCode, $RequestESign)
   {
     $postdata = json_encode($RequestESign);
-    return $this->executeCURL('/SignToken/Request', $ClientCode, null, true, null, $postdata);
+    return $this->executeCURL('/SignToken/Request', $ClientCode, null, true, null, $postdata)->receiptId;
   }
 
   public function getESignResult($ClientCode, $receiptID)
