@@ -98,20 +98,20 @@ class KakaocertService
         curl_setopt($http, CURLOPT_POST, 1);
         curl_setopt($http, CURLOPT_POSTFIELDS, $postdata);
 
+        $xDate = $this->Linkhub->getTime();
+
         $digestTarget = 'POST'.chr(10);
         $digestTarget = $digestTarget.base64_encode(md5($postdata,true)).chr(10);
         $digestTarget = $digestTarget.$xDate.chr(10);
 
         $digestTarget = $digestTarget.Linkhub::VERSION.chr(10);
-        $digestTarget = $digestTarget.$uri;
 
-        $digest = base64_encode(hash_hmac('sha1',$digestTarget,base64_decode(strtr($this->__SecretKey, '-_', '+/')),true));
+        $digest = base64_encode(hash_hmac('sha1',$digestTarget,base64_decode(strtr($this->Linkhub->getSecretKey(), '-_', '+/')),true));
 
-        $xDate = $this->getTime();
         $header[] = 'x-lh-date: '.$xDate;
         $header[] = 'x-lh-version: '.Linkhub::VERSION;
+        $header[] = 'x-kc-auth: '.$this->Linkhub->getLinkID().' '.$digest;
 
-        $header[] = 'x-kc-auth: '.$this->__LinkID.' '.$digest;
       }
 
       curl_setopt($http, CURLOPT_HTTPHEADER, $header);
