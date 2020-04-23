@@ -273,7 +273,7 @@ class KakaocertService
        if (is_null($receiptID) || empty($receiptID)) {
            throw new KakaocertException('관리번호가 입력되지 않았습니다.');
        }
-       $result = $this->executeCURL("/SignToken/" . $receiptID, $ClientCode);
+       $result = $this->executeCURL('/SignToken/' . $receiptID, $ClientCode);
 
        $ResultESign = new ResultESign();
        $ResultESign->fromJsonInfo($result);
@@ -356,6 +356,7 @@ class ResultESign
     isset($jsonInfo->token) ? $this->token = $jsonInfo->token : null;
     isset($jsonInfo->allowSimpleRegistYN) ? $this->allowSimpleRegistYN = $jsonInfo->allowSimpleRegistYN : null;
     isset($jsonInfo->verifyNameYN) ? $this->verifyNameYN = $jsonInfo->verifyNameYN : null;
+    isset($jsonInfo->payload) ? $this->payload = $jsonInfo->payload : null;
     isset($jsonInfo->requestDT) ? $this->requestDT = $jsonInfo->requestDT : null;
     isset($jsonInfo->expireDT) ? $this->expireDT = $jsonInfo->expireDT : null;
     isset($jsonInfo->clientCode) ? $this->clientCode = $jsonInfo->clientCode : null;
