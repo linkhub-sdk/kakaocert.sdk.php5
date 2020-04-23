@@ -335,6 +335,95 @@ class KakaocertException extends Exception
     }
 }
 
+class RequestCMS
+{
+  public $CallCenterNum;
+	public $Expires_in;
+	public $PayLoad;
+	public $ReceiverBirthDay;
+	public $ReceiverHP;
+	public $ReceiverName;
+	public $SubClientID;
+	public $TMSMessage;
+	public $TMSTitle;
+
+	public $isAllowSimpleRegistYN;
+	public $isVerifyNameYN;
+
+  public $BankAccountName;
+	public $BankAccountNum;
+	public $BankCode;
+	public $ClientUserID;
+
+}
+
+class ResultCMS
+{
+  public $receiptID;
+	public $regDT;
+	public $state;
+	public $receiverHP;
+	public $receiverName;
+	public $receiverBirthday;
+	public $expires_in;
+	public $callCenterNum;
+	public $token;
+	public $allowSimpleRegistYN;
+	public $verifyNameYN;
+	public $payload;
+	public $requestDT;
+	public $expireDT;
+	public $clientCode;
+	public $clientName;
+	public $tmstitle;
+	public $tmsmessage;
+	public $signedData;
+
+	public $subClientName;
+	public $subClientCode;
+	public $viewDT;
+	public $completeDT;
+	public $verifyDT;
+
+  public $bankAccountName;
+	public $bankAccountNum;
+	public $bankCode;
+	public $clientUserID;
+
+  public function fromJsonInfo($jsonInfo)
+  {
+    isset($jsonInfo->receiptID) ? $this->receiptID = $jsonInfo->receiptID : null;
+    isset($jsonInfo->regDT) ? $this->regDT = $jsonInfo->regDT : null;
+    isset($jsonInfo->state) ? $this->state = $jsonInfo->state : null;
+    isset($jsonInfo->receiverHP) ? $this->receiverHP = $jsonInfo->receiverHP : null;
+    isset($jsonInfo->receiverName) ? $this->receiverName = $jsonInfo->receiverName : null;
+    isset($jsonInfo->receiverBirthday) ? $this->receiverBirthday = $jsonInfo->receiverBirthday : null;
+    isset($jsonInfo->expires_in) ? $this->expires_in = $jsonInfo->expires_in : null;
+    isset($jsonInfo->callCenterNum) ? $this->callCenterNum = $jsonInfo->callCenterNum : null;
+    isset($jsonInfo->token) ? $this->token = $jsonInfo->token : null;
+    isset($jsonInfo->allowSimpleRegistYN) ? $this->allowSimpleRegistYN = $jsonInfo->allowSimpleRegistYN : null;
+    isset($jsonInfo->verifyNameYN) ? $this->verifyNameYN = $jsonInfo->verifyNameYN : null;
+    isset($jsonInfo->payload) ? $this->payload = $jsonInfo->payload : null;
+    isset($jsonInfo->requestDT) ? $this->requestDT = $jsonInfo->requestDT : null;
+    isset($jsonInfo->expireDT) ? $this->expireDT = $jsonInfo->expireDT : null;
+    isset($jsonInfo->clientCode) ? $this->clientCode = $jsonInfo->clientCode : null;
+    isset($jsonInfo->clientName) ? $this->clientName = $jsonInfo->clientName : null;
+    isset($jsonInfo->tmstitle) ? $this->tmstitle = $jsonInfo->tmstitle : null;
+    isset($jsonInfo->tmsmessage) ? $this->tmsmessage = $jsonInfo->tmsmessage : null;
+    isset($jsonInfo->signedData) ? $this->signedData = $jsonInfo->signedData : null;
+    isset($jsonInfo->subClientName) ? $this->subClientName = $jsonInfo->subClientName : null;
+    isset($jsonInfo->subClientCode) ? $this->subClientCode = $jsonInfo->subClientCode : null;
+    isset($jsonInfo->viewDT) ? $this->viewDT = $jsonInfo->viewDT : null;
+    isset($jsonInfo->completeDT) ? $this->completeDT = $jsonInfo->completeDT : null;
+    isset($jsonInfo->verifyDT) ? $this->verifyDT = $jsonInfo->verifyDT : null;
+    isset($jsonInfo->bankAccountName) ? $this->bankAccountName = $jsonInfo->bankAccountName : null;
+    isset($jsonInfo->bankAccountNum) ? $this->bankAccountNum = $jsonInfo->bankAccountNum : null;
+    isset($jsonInfo->bankCode) ? $this->bankCode = $jsonInfo->bankCode : null;
+    isset($jsonInfo->clientUserID) ? $this->clientUserID = $jsonInfo->clientUserID : null;
+  }
+}
+
+
 class RequestVerifyAuth
 {
   public $CallCenterNum;
