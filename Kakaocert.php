@@ -144,73 +144,29 @@ class KakaocertService
 
       $header[] = 'Accept-Encoding: gzip,deflate';
       $header[] = 'Connection: close';
-      if (is_null($CorpNum) == false) {
-        $header[] = 'Authorization: Bearer ' . $this->getsession_Token($CorpNum);
+      if (is_null($ClientCode) == false) {
+        $header[] = 'Authorization: Bearer ' . $this->getsession_Token($ClientCode);
       }
-      if (is_null($userID) == false) {
-        $header[] = 'x-pb-userid: ' . $userID;
-      }
-      if (is_null($action) == false) {
-        $header[] = 'X-HTTP-Method-Override: ' . $action;
-      }
+
       if ($isMultiPart == false) {
-        if (is_null($contentsType) == false) {
-          $header[] = 'Content-Type: ' . $contentsType;
-        } else {
-          $header[] = 'Content-Type: Application/json';
-        }
+        $header[] = 'Content-Type: Application/json';
         $postbody = $postdata;
-      } else { //Process MultipartBody.
-        $eol = "\r\n";
-        $postbody = '';
 
-        $mime_boundary = md5(time());
-        $header[] = 'Content-Type: multipart/form-data; boundary=' . $mime_boundary . $eol;
 
-        if (array_key_exists('form', $postdata)) {
-          $postbody .= '--' . $mime_boundary . $eol;
-          $postbody .= 'content-disposition: form-data; name="form"' . $eol;
-          $postbody .= 'content-type: Application/json;' . $eol . $eol;
-          $postbody .= $postdata['form'] . $eol;
+        $xDate = $this->Linkhub->getTime();
 
-          foreach ($postdata as $key => $value) {
-            if (substr($key, 0, 4) == 'file') {
-              if (substr($value, 0, 1) == '@') {
-                $value = substr($value, 1);
-              }
-              if (file_exists($value) == FALSE) {
-                throw new KakaocertException("전송할 파일이 존재하지 않습니다.", -99999999);
-              }
+        $digestTarget = 'POST'.chr(10);
+        $digestTarget = $digestTarget.base64_encode(md5($postdata,true)).chr(10);
+        $digestTarget = $digestTarget.$xDate.chr(10);
 
-              $fileContents = file_get_contents($value);
-              $postbody .= '--' . $mime_boundary . $eol;
-              $postbody .= "Content-Disposition: form-data; name=\"file\"; filename=\"" . basename($value) . "\"" . $eol;
+        $digestTarget = $digestTarget.Linkhub::VERSION.chr(10);
 
-              $postbody .= "Content-Type: Application/octet-stream" . $eol . $eol;
-              $postbody .= $fileContents . $eol;
-            }
+        $digest = base64_encode(hash_hmac('sha1',$digestTarget,base64_decode(strtr($this->Linkhub->getSecretKey(), '-_', '+/')),true));
 
-          }
-        }
+        $header[] = 'x-lh-date: '.$xDate;
+        $header[] = 'x-lh-version: '.Linkhub::VERSION;
+        $header[] = 'x-kc-auth: '.$this->Linkhub->getLinkID().' '.$digest;
 
-        if (array_key_exists('Filedata', $postdata)) {
-          $postbody .= '--' . $mime_boundary . $eol;
-          if (substr($postdata['Filedata'], 0, 1) == '@') {
-            $value = substr($postdata['Filedata'], 1);
-            $splitStr = explode(';', $value);
-            $path = $splitStr[0];
-            $fileName = substr($splitStr[1], 9);
-          }
-          if (file_exists($path) == FALSE) {
-            throw new KakaocertException("전송할 파일이 존재하지 않습니다.", -99999999);
-          }
-          $fileContents = file_get_contents($path);
-          $postbody .= 'content-disposition: form-data; name="Filedata"; filename="' . basename($fileName) . '"' . $eol;
-          $postbody .= 'content-type: Application/octet-stream;' . $eol . $eol;
-          $postbody .= $fileContents . $eol;
-        }
-
-        $postbody .= '--' . $mime_boundary . '--' . $eol;
 
       }
 
@@ -235,7 +191,7 @@ class KakaocertService
       }
 
       $ctx = stream_context_create($params);
-      $response = file_get_contents(Kakacoert::ServiceURL . $uri, false, $ctx);
+      $response = file_get_contents(KakaocertService::ServiceURL . $uri, false, $ctx);
 
       $is_gzip = 0 === mb_strpos($response, "\x1f" . "\x8b" . "\x08");
 
