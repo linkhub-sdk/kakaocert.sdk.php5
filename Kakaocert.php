@@ -47,6 +47,12 @@ class KakaocertService
     $this->scopes[] = $scope;
   }
 
+  public function IPRestrictOnOff($V)
+  {
+      $this->IPRestrictOnOff = $V;
+  }
+
+
   private function getsession_Token($CorpNum)
   {
     $targetToken = null;
@@ -82,7 +88,7 @@ class KakaocertService
       $http = curl_init(KakaocertService::ServiceURL . $uri);
       $header = array();
 
-      if (is_null($CorpNum) == false) {
+      if (is_null($ClientCode) == false) {
         $header[] = 'Authorization: Bearer ' . $this->getsession_Token($ClientCode);
       }
 
@@ -258,7 +264,7 @@ class KakaocertService
 
   public function requestESign($ClientCode, $RequestESign)
   {
-    $postdata = json_encode($Taxinvoice);
+    $postdata = json_encode($RequestESign);
     return $this->executeCURL('/SignToken/Request', $ClientCode, null, true, null, $postdata);
   }
 
