@@ -11,7 +11,7 @@
  * http://www.linkhub.co.kr
  * Author : Jeogn Yohan (code@linkhub.co.kr)
  * Written : 2020-04-23
- * Updated : 2020-08-31
+ * Updated : 2020-09-08
  *
  * Thanks for your interest.
  * We welcome any suggestions, feedbacks, blames or anythings.
@@ -226,13 +226,13 @@ class KakaocertService
     return $this->executeCURL('/SignToken/Request', $ClientCode, null, true, null, $postdata);
   }
 
-  public function getESignResult($ClientCode, $receiptID, $signature = null)
+  public function getESignState($ClientCode, $receiptID, $signature = null)
   {
     if (is_null($receiptID) || empty($receiptID)) {
       throw new KakaocertException('접수아이디가 입력되지 않았습니다.');
     }
 
-    $uri = '/SignToken/' . $receiptID;
+    $uri = '/SignToken/Status/' . $receiptID;
 
     if (!is_null($signature) || !empty($signature)) {
       $uri .= '/'.$signature;
@@ -251,12 +251,12 @@ class KakaocertService
     return $this->executeCURL('/SignIdentity/Request', $ClientCode, null, true, null, $postdata)->receiptId;
   }
 
-  public function getVerifyAuthResult($ClientCode, $receiptID)
+  public function getVerifyAuthState($ClientCode, $receiptID)
   {
       if (is_null($receiptID) || empty($receiptID)) {
           throw new KakaocertException('접수아이디가 입력되지 않았습니다.');
       }
-      $result = $this->executeCURL('/SignIdentity/' . $receiptID, $ClientCode);
+      $result = $this->executeCURL('/SignIdentity/Status/' . $receiptID, $ClientCode);
 
       $ResultVerifyAuth = new ResultVerifyAuth();
       $ResultVerifyAuth->fromJsonInfo($result);
@@ -269,12 +269,12 @@ class KakaocertService
      return $this->executeCURL('/SignDirectDebit/Request', $ClientCode, null, true, null, $postdata)->receiptId;
    }
 
-   public function getCMSResult($ClientCode, $receiptID)
+   public function getCMSState($ClientCode, $receiptID)
   {
       if (is_null($receiptID) || empty($receiptID)) {
           throw new KakaocertException('접수아이디가 입력되지 않았습니다.');
       }
-      $result = $this->executeCURL('/SignDirectDebit/' . $receiptID, $ClientCode);
+      $result = $this->executeCURL('/SignDirectDebit/Status/' . $receiptID, $ClientCode);
 
       $ResultCMS = new ResultCMS();
       $ResultCMS->fromJsonInfo($result);
@@ -340,7 +340,6 @@ class ResultCMS
 	public $clientName;
 	public $tmstitle;
 	public $tmsmessage;
-	public $signedData;
 
 	public $subClientName;
 	public $subClientCode;
@@ -366,7 +365,7 @@ class ResultCMS
     isset($jsonInfo->clientName) ? $this->clientName = $jsonInfo->clientName : null;
     isset($jsonInfo->tmstitle) ? $this->tmstitle = $jsonInfo->tmstitle : null;
     isset($jsonInfo->tmsmessage) ? $this->tmsmessage = $jsonInfo->tmsmessage : null;
-    isset($jsonInfo->signedData) ? $this->signedData = $jsonInfo->signedData : null;
+
     isset($jsonInfo->subClientName) ? $this->subClientName = $jsonInfo->subClientName : null;
     isset($jsonInfo->subClientCode) ? $this->subClientCode = $jsonInfo->subClientCode : null;
     isset($jsonInfo->viewDT) ? $this->viewDT = $jsonInfo->viewDT : null;
@@ -401,7 +400,7 @@ class ResultVerifyAuth
 
 	public $expires_in;
 	public $callCenterNum;
-	public $token;
+
 	public $allowSimpleRegistYN;
 	public $verifyNameYN;
 	public $payload;
@@ -411,7 +410,6 @@ class ResultVerifyAuth
 	public $clientName;
 	public $tmstitle;
 	public $tmsmessage;
-	public $returnToken;
 
 	public $subClientName;
 	public $subClientCode;
@@ -427,7 +425,7 @@ class ResultVerifyAuth
 
     isset($jsonInfo->expires_in) ? $this->expires_in = $jsonInfo->expires_in : null;
     isset($jsonInfo->callCenterNum) ? $this->callCenterNum = $jsonInfo->callCenterNum : null;
-    isset($jsonInfo->token) ? $this->token = $jsonInfo->token : null;
+
     isset($jsonInfo->allowSimpleRegistYN) ? $this->allowSimpleRegistYN = $jsonInfo->allowSimpleRegistYN : null;
     isset($jsonInfo->verifyNameYN) ? $this->verifyNameYN = $jsonInfo->verifyNameYN : null;
     isset($jsonInfo->payload) ? $this->payload = $jsonInfo->payload : null;
@@ -437,7 +435,7 @@ class ResultVerifyAuth
     isset($jsonInfo->clientName) ? $this->clientName = $jsonInfo->clientName : null;
     isset($jsonInfo->tmstitle) ? $this->tmstitle = $jsonInfo->tmstitle : null;
     isset($jsonInfo->tmsmessage) ? $this->tmsmessage = $jsonInfo->tmsmessage : null;
-    isset($jsonInfo->returnToken) ? $this->returnToken = $jsonInfo->returnToken : null;
+
     isset($jsonInfo->subClientName) ? $this->subClientName = $jsonInfo->subClientName : null;
     isset($jsonInfo->subClientCode) ? $this->subClientCode = $jsonInfo->subClientCode : null;
     isset($jsonInfo->viewDT) ? $this->viewDT = $jsonInfo->viewDT : null;
@@ -473,7 +471,7 @@ class ResultESign
 
 	public $expires_in;
 	public $callCenterNum;
-	public $token;
+
 	public $allowSimpleRegistYN;
 	public $verifyNameYN;
 	public $payload;
@@ -483,7 +481,6 @@ class ResultESign
 	public $clientName;
 	public $tmstitle;
 	public $tmsmessage;
-	public $signedData;
 
 	public $subClientName;
 	public $subClientCode;
@@ -501,7 +498,7 @@ class ResultESign
 
     isset($jsonInfo->expires_in) ? $this->expires_in = $jsonInfo->expires_in : null;
     isset($jsonInfo->callCenterNum) ? $this->callCenterNum = $jsonInfo->callCenterNum : null;
-    isset($jsonInfo->token) ? $this->token = $jsonInfo->token : null;
+
     isset($jsonInfo->allowSimpleRegistYN) ? $this->allowSimpleRegistYN = $jsonInfo->allowSimpleRegistYN : null;
     isset($jsonInfo->verifyNameYN) ? $this->verifyNameYN = $jsonInfo->verifyNameYN : null;
     isset($jsonInfo->payload) ? $this->payload = $jsonInfo->payload : null;
@@ -511,7 +508,7 @@ class ResultESign
     isset($jsonInfo->clientName) ? $this->clientName = $jsonInfo->clientName : null;
     isset($jsonInfo->tmstitle) ? $this->tmstitle = $jsonInfo->tmstitle : null;
     isset($jsonInfo->tmsmessage) ? $this->tmsmessage = $jsonInfo->tmsmessage : null;
-    isset($jsonInfo->signedData) ? $this->signedData = $jsonInfo->signedData : null;
+
     isset($jsonInfo->subClientName) ? $this->subClientName = $jsonInfo->subClientName : null;
     isset($jsonInfo->subClientCode) ? $this->subClientCode = $jsonInfo->subClientCode : null;
     isset($jsonInfo->viewDT) ? $this->viewDT = $jsonInfo->viewDT : null;
