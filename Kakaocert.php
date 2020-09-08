@@ -226,17 +226,13 @@ class KakaocertService
     return $this->executeCURL('/SignToken/Request', $ClientCode, null, true, null, $postdata);
   }
 
-  public function getESignState($ClientCode, $receiptID, $signature = null)
+  public function getESignState($ClientCode, $receiptID)
   {
     if (is_null($receiptID) || empty($receiptID)) {
       throw new KakaocertException('접수아이디가 입력되지 않았습니다.');
     }
 
     $uri = '/SignToken/Status/' . $receiptID;
-
-    if (!is_null($signature) || !empty($signature)) {
-      $uri .= '/'.$signature;
-    }
 
     $result = $this->executeCURL($uri, $ClientCode);
 
@@ -279,6 +275,38 @@ class KakaocertService
       $ResultCMS = new ResultCMS();
       $ResultCMS->fromJsonInfo($result);
       return $ResultCMS;
+  }
+
+  public function verifyESign($ClientCode, $receiptID, $signature = null)
+  {
+    if (is_null($receiptID) || empty($receiptID)) {
+      throw new KakaocertException('접수아이디가 입력되지 않았습니다.');
+    }
+
+    $uri = '/SignToken/Verify/' . $receiptID;
+
+    if (!is_null($signature) || !empty($signature)) {
+      $uri .= '/'.$signature;
+    }
+
+    return $this->executeCURL($uri, $ClientCode);
+  }
+
+  public function verifyAuth($ClientCode, $receiptID)
+  {
+    if (is_null($receiptID) || empty($receiptID)) {
+      throw new KakaocertException('접수아이디가 입력되지 않았습니다.');
+    }
+
+    return $this->executeCURL('/SignIdentity/Verify/' . $receiptID, $ClientCode);
+  }
+
+  public function verifyCMS($ClientCode, $receiptID)
+  {
+     if (is_null($receiptID) || empty($receiptID)) {
+       throw new KakaocertException('접수아이디가 입력되지 않았습니다.');
+     }
+     return $this->executeCURL('/SignDirectDebit/Verify/' . $receiptID, $ClientCode);
   }
 } // end of KakaocertService
 
