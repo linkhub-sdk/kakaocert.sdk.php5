@@ -358,7 +358,7 @@ class ResultCMS
 
 	public $expires_in;
 	public $callCenterNum;
-	public $token;
+
 	public $allowSimpleRegistYN;
 	public $verifyNameYN;
 	public $payload;
@@ -383,7 +383,7 @@ class ResultCMS
 
     isset($jsonInfo->expires_in) ? $this->expires_in = $jsonInfo->expires_in : null;
     isset($jsonInfo->callCenterNum) ? $this->callCenterNum = $jsonInfo->callCenterNum : null;
-    isset($jsonInfo->token) ? $this->token = $jsonInfo->token : null;
+    
     isset($jsonInfo->allowSimpleRegistYN) ? $this->allowSimpleRegistYN = $jsonInfo->allowSimpleRegistYN : null;
     isset($jsonInfo->verifyNameYN) ? $this->verifyNameYN = $jsonInfo->verifyNameYN : null;
     isset($jsonInfo->payload) ? $this->payload = $jsonInfo->payload : null;
