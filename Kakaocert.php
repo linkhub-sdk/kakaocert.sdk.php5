@@ -11,7 +11,7 @@
  * http://www.linkhub.co.kr
  * Author : Jeogn Yohan (code@linkhub.co.kr)
  * Written : 2020-04-23
- * Updated : 2020-09-08
+ * Updated : 2021-09-16
  *
  * Thanks for your interest.
  * We welcome any suggestions, feedbacks, blames or anythings.
@@ -24,12 +24,16 @@ class KakaocertService
 {
   const ServiceID = 'KAKAOCERT';
   const ServiceURL = 'https://kakaocert-api.linkhub.co.kr';
-  const Version = '1.0';
+  const ServiceURL_Static = 'https://static-kakaocert-api.linkhub.co.kr';
+  const ServiceURL_GA = 'https://ga-kakaocert-api.linkhub.co.kr';
+  const Version = '2.0';
 
   private $Token_Table = array();
   private $Linkhub;
   private $IsTest = false;
   private $IPRestrictOnOff = true;
+  private $UseStaticIP = false;
+  private $UseGAIP = false;
   private $scopes = array();
   private $__requestMode = LINKHUB_COMM_MODE;
 
@@ -52,6 +56,25 @@ class KakaocertService
       $this->IPRestrictOnOff = $V;
   }
 
+  public function UseStaticIP($V)
+  {
+      $this->UseStaticIP = $V;
+  }
+
+  public function UseGAIP($V)
+  {
+      $this->UseGAIP = $V;
+  }
+
+  // 서비스 URL
+  private function getTargetURL(){
+      if($this->UseGAIP){
+          return KakaocertService::ServiceURL_GA;
+      } else if($this->UseStaticIP){
+          return KakaocertService::ServiceURL_Static;
+      }
+      return KakaocertService::ServiceURL;
+  }
 
   private function getsession_Token($CorpNum)
   {
@@ -68,13 +91,13 @@ class KakaocertService
     } else {
       $Expiration = new DateTime($targetToken->expiration, new DateTimeZone("UTC"));
 
-      $now = $this->Linkhub->getTime();
+      $now = $this->Linkhub->getTime($this->UseStaticIP, false, $this->UseGAIP);
       $Refresh = $Expiration < $now;
     }
 
     if ($Refresh) {
       try {
-        $targetToken = $this->Linkhub->getToken(KakaocertService::ServiceID, $CorpNum, $this->scopes, $this->IPRestrictOnOff ? null : "*");
+        $targetToken = $this->Linkhub->getToken(KakaocertService::ServiceID, $CorpNum, $this->scopes, $this->IPRestrictOnOff ? null : "*", $this->UseStaticIP, false, $this->UseGAIP);
       } catch (LinkhubException $le) {
         throw new KakaocertException($le->getMessage(), $le->getCode());
       }
@@ -82,10 +105,14 @@ class KakaocertService
     }
     return $targetToken->session_token;
   }
+
   protected function executeCURL($uri, $ClientCode = null, $userID = null, $isPost = false, $action = null, $postdata = null, $isMultiPart = false, $contentsType = null)
   {
     if ($this->__requestMode != "STREAM") {
-      $http = curl_init(KakaocertService::ServiceURL . $uri);
+
+      $targetURL = $this->getTargetURL();
+
+      $http = curl_init($targetURL. $uri);
       $header = array();
 
       if (is_null($ClientCode) == false) {
@@ -98,15 +125,16 @@ class KakaocertService
         curl_setopt($http, CURLOPT_POST, 1);
         curl_setopt($http, CURLOPT_POSTFIELDS, $postdata);
 
-        $xDate = $this->Linkhub->getTime();
+        $xDate = $this->Linkhub->getTime($this->UseStaticIP, false, $this->UseGAIP);
 
         $digestTarget = 'POST'.chr(10);
-        $digestTarget = $digestTarget.base64_encode(md5($postdata,true)).chr(10);
+        $digestTarget = $digestTarget.base64_encode(hash('sha256',$postdata,true)).chr(10);
+
         $digestTarget = $digestTarget.$xDate.chr(10);
 
         $digestTarget = $digestTarget.Linkhub::VERSION.chr(10);
 
-        $digest = base64_encode(hash_hmac('sha1',$digestTarget,base64_decode(strtr($this->Linkhub->getSecretKey(), '-_', '+/')),true));
+        $digest = base64_encode(hash_hmac('sha256',$digestTarget,base64_decode(strtr($this->Linkhub->getSecretKey(), '-_', '+/')),true));
 
         $header[] = 'x-lh-date: '.$xDate;
         $header[] = 'x-lh-version: '.Linkhub::VERSION;
@@ -137,6 +165,7 @@ class KakaocertService
       if( 0 === mb_strpos($contentType, 'application/pdf')) {
         return $responseJson;
       }
+
       return json_decode($responseJson);
 
     } else {
@@ -153,7 +182,7 @@ class KakaocertService
         $postbody = $postdata;
 
 
-        $xDate = $this->Linkhub->getTime();
+        $xDate = $this->Linkhub->getTime($this->UseStaticIP, false, $this->UseGAIP);
 
         $digestTarget = 'POST'.chr(10);
         $digestTarget = $digestTarget.base64_encode(md5($postdata,true)).chr(10);
@@ -191,7 +220,8 @@ class KakaocertService
       }
 
       $ctx = stream_context_create($params);
-      $response = file_get_contents(KakaocertService::ServiceURL . $uri, false, $ctx);
+      $targetURL = $this->getTargetURL();
+      $response = file_get_contents($targetURL . $uri, false, $ctx);
 
       $is_gzip = 0 === mb_strpos($response, "\x1f" . "\x8b" . "\x08");
 
@@ -383,7 +413,7 @@ class ResultCMS
 
     isset($jsonInfo->expires_in) ? $this->expires_in = $jsonInfo->expires_in : null;
     isset($jsonInfo->callCenterNum) ? $this->callCenterNum = $jsonInfo->callCenterNum : null;
-    
+
     isset($jsonInfo->allowSimpleRegistYN) ? $this->allowSimpleRegistYN = $jsonInfo->allowSimpleRegistYN : null;
     isset($jsonInfo->verifyNameYN) ? $this->verifyNameYN = $jsonInfo->verifyNameYN : null;
     isset($jsonInfo->payload) ? $this->payload = $jsonInfo->payload : null;
