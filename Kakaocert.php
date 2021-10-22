@@ -185,17 +185,16 @@ class KakaocertService
         $xDate = $this->Linkhub->getTime($this->UseStaticIP, false, $this->UseGAIP);
 
         $digestTarget = 'POST'.chr(10);
-        $digestTarget = $digestTarget.base64_encode(md5($postdata,true)).chr(10);
+        $digestTarget = $digestTarget.base64_encode(hash('sha256',$postdata,true)).chr(10);
         $digestTarget = $digestTarget.$xDate.chr(10);
 
         $digestTarget = $digestTarget.Linkhub::VERSION.chr(10);
 
-        $digest = base64_encode(hash_hmac('sha1',$digestTarget,base64_decode(strtr($this->Linkhub->getSecretKey(), '-_', '+/')),true));
+        $digest = base64_encode(hash_hmac('sha256',$digestTarget,base64_decode(strtr($this->Linkhub->getSecretKey(), '-_', '+/')),true));
 
         $header[] = 'x-lh-date: '.$xDate;
         $header[] = 'x-lh-version: '.Linkhub::VERSION;
         $header[] = 'x-kc-auth: '.$this->Linkhub->getLinkID().' '.$digest;
-
 
       }
 
