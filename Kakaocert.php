@@ -8,10 +8,10 @@
  * This module uses curl and openssl for HTTPS Request. So related modules must
  * be installed and enabled.
  *
- * http://www.linkhub.co.kr
- * Author : Jeogn Yohan (code@linkhub.co.kr)
+ * https://www.linkhub.co.kr
+ * Author : Jeogn Yohan (code@linkhubcorp.com)
  * Written : 2020-04-23
- * Updated : 2021-09-16
+ * Updated : 2022-04-19
  *
  * Thanks for your interest.
  * We welcome any suggestions, feedbacks, blames or anythings.
