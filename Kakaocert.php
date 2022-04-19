@@ -34,6 +34,8 @@ class KakaocertService
   private $IPRestrictOnOff = true;
   private $UseStaticIP = false;
   private $UseGAIP = false;
+  private $UseLocalTimeYN = true;
+
   private $scopes = array();
   private $__requestMode = LINKHUB_COMM_MODE;
 
@@ -66,6 +68,11 @@ class KakaocertService
       $this->UseGAIP = $V;
   }
 
+  public function UseLocalTimeYN($V)
+  {
+      $this->UseLocalTimeYN = $V;
+  }
+
   // 서비스 URL
   private function getTargetURL(){
       if($this->UseGAIP){
@@ -91,13 +98,13 @@ class KakaocertService
     } else {
       $Expiration = new DateTime($targetToken->expiration, new DateTimeZone("UTC"));
 
-      $now = $this->Linkhub->getTime($this->UseStaticIP, false, $this->UseGAIP);
+      $now = $this->Linkhub->getTime($this->UseStaticIP, $this->UseLocalTimeYN, $this->UseGAIP);
       $Refresh = $Expiration < $now;
     }
 
     if ($Refresh) {
       try {
-        $targetToken = $this->Linkhub->getToken(KakaocertService::ServiceID, $CorpNum, $this->scopes, $this->IPRestrictOnOff ? null : "*", $this->UseStaticIP, false, $this->UseGAIP);
+        $targetToken = $this->Linkhub->getToken(KakaocertService::ServiceID, $CorpNum, $this->scopes, $this->IPRestrictOnOff ? null : "*", $this->UseStaticIP, $this->UseLocalTimeYN, $this->UseGAIP);
       } catch (LinkhubException $le) {
         throw new KakaocertException($le->getMessage(), $le->getCode());
       }
