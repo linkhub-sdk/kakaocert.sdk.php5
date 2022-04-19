@@ -295,13 +295,15 @@ class KakaocertService
       return $ResultVerifyAuth;
   }
 
-   public function requestCMS($ClientCode, $RequestCMS)
-   {
-     $postdata = json_encode($RequestCMS);
-     return $this->executeCURL('/SignDirectDebit/Request', $ClientCode, null, true, null, $postdata)->receiptId;
-   }
+  public function requestCMS($ClientCode, $RequestCMS, $appUseYN = false)
+  {
+    $RequestCMS->isAppUseYN = $appUseYN;
 
-   public function getCMSState($ClientCode, $receiptID)
+    $postdata = json_encode($RequestCMS);
+    return $this->executeCURL('/SignDirectDebit/Request', $ClientCode, null, true, null, $postdata)->receiptId;
+  }
+
+  public function getCMSState($ClientCode, $receiptID)
   {
       if (is_null($receiptID) || empty($receiptID)) {
           throw new KakaocertException('접수아이디가 입력되지 않았습니다.');
@@ -366,7 +368,7 @@ class KakaocertException extends Exception
 
 class RequestCMS
 {
-  public $CallCenterNum;
+    public $CallCenterNum;
 	public $Expires_in;
 	public $PayLoad;
 	public $ReceiverBirthDay;
@@ -379,10 +381,12 @@ class RequestCMS
 	public $isAllowSimpleRegistYN;
 	public $isVerifyNameYN;
 
-  public $BankAccountName;
+    public $BankAccountName;
 	public $BankAccountNum;
 	public $BankCode;
 	public $ClientUserID;
+
+    public $isAppUseYN;
 
 }
 
@@ -411,6 +415,8 @@ class ResultCMS
 	public $completeDT;
 	public $verifyDT;
 
+    public $appUseYN;
+
   public function fromJsonInfo($jsonInfo)
   {
     isset($jsonInfo->receiptID) ? $this->receiptID = $jsonInfo->receiptID : null;
@@ -435,6 +441,7 @@ class ResultCMS
     isset($jsonInfo->viewDT) ? $this->viewDT = $jsonInfo->viewDT : null;
     isset($jsonInfo->completeDT) ? $this->completeDT = $jsonInfo->completeDT : null;
     isset($jsonInfo->verifyDT) ? $this->verifyDT = $jsonInfo->verifyDT : null;
+    isset($jsonInfo->appUseYN) ? $this->appUseYN = $jsonInfo->appUseYN : null;
 
   }
 }
