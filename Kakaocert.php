@@ -1,4 +1,5 @@
 <?php
+
 /**
  * =====================================================================================
  * Class for base module for Kakaocert API SDK. It include base functionality for
@@ -55,32 +56,33 @@ class KakaocertService
 
   public function IPRestrictOnOff($V)
   {
-      $this->IPRestrictOnOff = $V;
+    $this->IPRestrictOnOff = $V;
   }
 
   public function UseStaticIP($V)
   {
-      $this->UseStaticIP = $V;
+    $this->UseStaticIP = $V;
   }
 
   public function UseGAIP($V)
   {
-      $this->UseGAIP = $V;
+    $this->UseGAIP = $V;
   }
 
   public function UseLocalTimeYN($V)
   {
-      $this->UseLocalTimeYN = $V;
+    $this->UseLocalTimeYN = $V;
   }
 
   // 서비스 URL
-  private function getTargetURL(){
-      if($this->UseGAIP){
-          return KakaocertService::ServiceURL_GA;
-      } else if($this->UseStaticIP){
-          return KakaocertService::ServiceURL_Static;
-      }
-      return KakaocertService::ServiceURL;
+  private function getTargetURL()
+  {
+    if ($this->UseGAIP) {
+      return KakaocertService::ServiceURL_GA;
+    } else if ($this->UseStaticIP) {
+      return KakaocertService::ServiceURL_Static;
+    }
+    return KakaocertService::ServiceURL;
   }
 
   private function getsession_Token($CorpNum)
@@ -119,7 +121,7 @@ class KakaocertService
 
       $targetURL = $this->getTargetURL();
 
-      $http = curl_init($targetURL. $uri);
+      $http = curl_init($targetURL . $uri);
       $header = array();
 
       if (is_null($ClientCode) == false) {
@@ -134,19 +136,18 @@ class KakaocertService
 
         $xDate = $this->Linkhub->getTime($this->UseStaticIP, false, $this->UseGAIP);
 
-        $digestTarget = 'POST'.chr(10);
-        $digestTarget = $digestTarget.base64_encode(hash('sha256',$postdata,true)).chr(10);
+        $digestTarget = 'POST' . chr(10);
+        $digestTarget = $digestTarget . base64_encode(hash('sha256', $postdata, true)) . chr(10);
 
-        $digestTarget = $digestTarget.$xDate.chr(10);
+        $digestTarget = $digestTarget . $xDate . chr(10);
 
-        $digestTarget = $digestTarget.Linkhub::VERSION.chr(10);
+        $digestTarget = $digestTarget . Linkhub::VERSION . chr(10);
 
-        $digest = base64_encode(hash_hmac('sha256',$digestTarget,base64_decode(strtr($this->Linkhub->getSecretKey(), '-_', '+/')),true));
+        $digest = base64_encode(hash_hmac('sha256', $digestTarget, base64_decode(strtr($this->Linkhub->getSecretKey(), '-_', '+/')), true));
 
-        $header[] = 'x-lh-date: '.$xDate;
-        $header[] = 'x-lh-version: '.Linkhub::VERSION;
-        $header[] = 'x-kc-auth: '.$this->Linkhub->getLinkID().' '.$digest;
-
+        $header[] = 'x-lh-date: ' . $xDate;
+        $header[] = 'x-lh-version: ' . Linkhub::VERSION;
+        $header[] = 'x-kc-auth: ' . $this->Linkhub->getLinkID() . ' ' . $digest;
       }
 
       curl_setopt($http, CURLOPT_HTTPHEADER, $header);
@@ -169,12 +170,11 @@ class KakaocertService
         throw new KakaocertException($responseJson);
       }
 
-      if( 0 === mb_strpos($contentType, 'application/pdf')) {
+      if (0 === mb_strpos($contentType, 'application/pdf')) {
         return $responseJson;
       }
 
       return json_decode($responseJson);
-
     } else {
       $header = array();
 
@@ -191,26 +191,26 @@ class KakaocertService
 
         $xDate = $this->Linkhub->getTime($this->UseStaticIP, false, $this->UseGAIP);
 
-        $digestTarget = 'POST'.chr(10);
-        $digestTarget = $digestTarget.base64_encode(hash('sha256',$postdata,true)).chr(10);
-        $digestTarget = $digestTarget.$xDate.chr(10);
+        $digestTarget = 'POST' . chr(10);
+        $digestTarget = $digestTarget . base64_encode(hash('sha256', $postdata, true)) . chr(10);
+        $digestTarget = $digestTarget . $xDate . chr(10);
 
-        $digestTarget = $digestTarget.Linkhub::VERSION.chr(10);
+        $digestTarget = $digestTarget . Linkhub::VERSION . chr(10);
 
-        $digest = base64_encode(hash_hmac('sha256',$digestTarget,base64_decode(strtr($this->Linkhub->getSecretKey(), '-_', '+/')),true));
+        $digest = base64_encode(hash_hmac('sha256', $digestTarget, base64_decode(strtr($this->Linkhub->getSecretKey(), '-_', '+/')), true));
 
-        $header[] = 'x-lh-date: '.$xDate;
-        $header[] = 'x-lh-version: '.Linkhub::VERSION;
-        $header[] = 'x-kc-auth: '.$this->Linkhub->getLinkID().' '.$digest;
-
+        $header[] = 'x-lh-date: ' . $xDate;
+        $header[] = 'x-lh-version: ' . Linkhub::VERSION;
+        $header[] = 'x-kc-auth: ' . $this->Linkhub->getLinkID() . ' ' . $digest;
       }
 
       $params = array(
         'http' => array(
-        'ignore_errors' => TRUE,
-        'protocol_version' => '1.0',
-        'method' => 'GET'
-      ));
+          'ignore_errors' => TRUE,
+          'protocol_version' => '1.0',
+          'method' => 'GET'
+        )
+      );
 
       if ($isPost) {
         $params['http']['method'] = 'POST';
@@ -239,12 +239,11 @@ class KakaocertService
         throw new KakaocertException($response);
       }
 
-      foreach( $http_response_header as $k=>$v )
-      {
-        $t = explode( ':', $v, 2 );
-        if( preg_match('/^Content-Type:/i', $v, $out )) {
+      foreach ($http_response_header as $k => $v) {
+        $t = explode(':', $v, 2);
+        if (preg_match('/^Content-Type:/i', $v, $out)) {
           $contentType = trim($t[1]);
-          if( 0 === mb_strpos($contentType, 'application/pdf')) {
+          if (0 === mb_strpos($contentType, 'application/pdf')) {
             return $response;
           }
         }
@@ -285,14 +284,14 @@ class KakaocertService
 
   public function getVerifyAuthState($ClientCode, $receiptID)
   {
-      if (is_null($receiptID) || empty($receiptID)) {
-          throw new KakaocertException('접수아이디가 입력되지 않았습니다.');
-      }
-      $result = $this->executeCURL('/SignIdentity/Status/' . $receiptID, $ClientCode);
+    if (is_null($receiptID) || empty($receiptID)) {
+      throw new KakaocertException('접수아이디가 입력되지 않았습니다.');
+    }
+    $result = $this->executeCURL('/SignIdentity/Status/' . $receiptID, $ClientCode);
 
-      $ResultVerifyAuth = new ResultVerifyAuth();
-      $ResultVerifyAuth->fromJsonInfo($result);
-      return $ResultVerifyAuth;
+    $ResultVerifyAuth = new ResultVerifyAuth();
+    $ResultVerifyAuth->fromJsonInfo($result);
+    return $ResultVerifyAuth;
   }
 
   public function requestCMS($ClientCode, $RequestCMS, $appUseYN = false)
@@ -305,14 +304,14 @@ class KakaocertService
 
   public function getCMSState($ClientCode, $receiptID)
   {
-      if (is_null($receiptID) || empty($receiptID)) {
-          throw new KakaocertException('접수아이디가 입력되지 않았습니다.');
-      }
-      $result = $this->executeCURL('/SignDirectDebit/Status/' . $receiptID, $ClientCode);
+    if (is_null($receiptID) || empty($receiptID)) {
+      throw new KakaocertException('접수아이디가 입력되지 않았습니다.');
+    }
+    $result = $this->executeCURL('/SignDirectDebit/Status/' . $receiptID, $ClientCode);
 
-      $ResultCMS = new ResultCMS();
-      $ResultCMS->fromJsonInfo($result);
-      return $ResultCMS;
+    $ResultCMS = new ResultCMS();
+    $ResultCMS->fromJsonInfo($result);
+    return $ResultCMS;
   }
 
   public function verifyESign($ClientCode, $receiptID, $signature = null)
@@ -324,7 +323,7 @@ class KakaocertService
     $uri = '/SignToken/Verify/' . $receiptID;
 
     if (!is_null($signature) || !empty($signature)) {
-      $uri .= '/'.$signature;
+      $uri .= '/' . $signature;
     }
 
     return $this->executeCURL($uri, $ClientCode);
@@ -341,83 +340,82 @@ class KakaocertService
 
   public function verifyCMS($ClientCode, $receiptID)
   {
-     if (is_null($receiptID) || empty($receiptID)) {
-       throw new KakaocertException('접수아이디가 입력되지 않았습니다.');
-     }
-     return $this->executeCURL('/SignDirectDebit/Verify/' . $receiptID, $ClientCode);
+    if (is_null($receiptID) || empty($receiptID)) {
+      throw new KakaocertException('접수아이디가 입력되지 않았습니다.');
+    }
+    return $this->executeCURL('/SignDirectDebit/Verify/' . $receiptID, $ClientCode);
   }
 } // end of KakaocertService
 
 class KakaocertException extends Exception
 {
-    public function __construct($response, $code = -99999999, Exception $previous = null)
-    {
-        $Err = json_decode($response);
-        if (is_null($Err)) {
-            parent::__construct($response, $code);
-        } else {
-            parent::__construct($Err->message, $Err->code);
-        }
+  public function __construct($response, $code = -99999999, Exception $previous = null)
+  {
+    $Err = json_decode($response);
+    if (is_null($Err)) {
+      parent::__construct($response, $code);
+    } else {
+      parent::__construct($Err->message, $Err->code);
     }
+  }
 
-    public function __toString()
-    {
-        return __CLASS__ . ": [{$this->code}]: {$this->message}\n";
-    }
+  public function __toString()
+  {
+    return __CLASS__ . ": [{$this->code}]: {$this->message}\n";
+  }
 }
 
 class RequestCMS
 {
-    public $CallCenterNum;
-    public $CallCenterName;
-	public $Expires_in;
-	public $PayLoad;
-	public $ReceiverBirthDay;
-	public $ReceiverHP;
-	public $ReceiverName;
-	public $SubClientID;
-	public $TMSMessage;
-	public $TMSTitle;
+  public $CallCenterNum;
+  public $CallCenterName;
+  public $Expires_in;
+  public $PayLoad;
+  public $ReceiverBirthDay;
+  public $ReceiverHP;
+  public $ReceiverName;
+  public $SubClientID;
+  public $TMSMessage;
+  public $TMSTitle;
 
-	public $isAllowSimpleRegistYN;
-	public $isVerifyNameYN;
+  public $isAllowSimpleRegistYN;
+  public $isVerifyNameYN;
 
-    public $BankAccountName;
-	public $BankAccountNum;
-	public $BankCode;
-	public $ClientUserID;
+  public $BankAccountName;
+  public $BankAccountNum;
+  public $BankCode;
+  public $ClientUserID;
 
-    public $isAppUseYN;
-
+  public $isAppUseYN;
 }
 
 class ResultCMS
 {
   public $receiptID;
-	public $regDT;
-	public $state;
+  public $regDT;
+  public $state;
 
-	public $expires_in;
-	public $callCenterNum;
-    public $callCenterName;
+  public $expires_in;
+  public $callCenterNum;
+  public $callCenterName;
 
-	public $allowSimpleRegistYN;
-	public $verifyNameYN;
-	public $payload;
-	public $requestDT;
-	public $expireDT;
-	public $clientCode;
-	public $clientName;
-	public $tmstitle;
-	public $tmsmessage;
+  public $allowSimpleRegistYN;
+  public $verifyNameYN;
+  public $payload;
+  public $requestDT;
+  public $expireDT;
+  public $clientCode;
+  public $clientName;
+  public $tmstitle;
+  public $tmsmessage;
 
-	public $subClientName;
-	public $subClientCode;
-	public $viewDT;
-	public $completeDT;
-	public $verifyDT;
+  public $subClientName;
+  public $subClientCode;
+  public $viewDT;
+  public $completeDT;
+  public $verifyDT;
 
-    public $appUseYN;
+  public $appUseYN;
 
   public function fromJsonInfo($jsonInfo)
   {
@@ -445,53 +443,52 @@ class ResultCMS
     isset($jsonInfo->completeDT) ? $this->completeDT = $jsonInfo->completeDT : null;
     isset($jsonInfo->verifyDT) ? $this->verifyDT = $jsonInfo->verifyDT : null;
     isset($jsonInfo->appUseYN) ? $this->appUseYN = $jsonInfo->appUseYN : null;
-
   }
 }
 
 
 class RequestVerifyAuth
 {
-    public $CallCenterNum;
-    public $CallCenterName;
-	public $Expires_in;
-	public $PayLoad;
-	public $ReceiverBirthDay;
-	public $ReceiverHP;
-	public $ReceiverName;
-	public $SubClientID;
-	public $TMSMessage;
-	public $TMSTitle;
-	public $Token;
-	public $isAllowSimpleRegistYN;
-	public $isVerifyNameYN;
+  public $CallCenterNum;
+  public $CallCenterName;
+  public $Expires_in;
+  public $PayLoad;
+  public $ReceiverBirthDay;
+  public $ReceiverHP;
+  public $ReceiverName;
+  public $SubClientID;
+  public $TMSMessage;
+  public $TMSTitle;
+  public $Token;
+  public $isAllowSimpleRegistYN;
+  public $isVerifyNameYN;
 }
 
 class ResultVerifyAuth
 {
   public $receiptID;
-	public $regDT;
-	public $state;
+  public $regDT;
+  public $state;
 
-	public $expires_in;
-	public $callCenterNum;
-    public $callCenterName;
+  public $expires_in;
+  public $callCenterNum;
+  public $callCenterName;
 
-	public $allowSimpleRegistYN;
-	public $verifyNameYN;
-	public $payload;
-	public $requestDT;
-	public $expireDT;
-	public $clientCode;
-	public $clientName;
-	public $tmstitle;
-	public $tmsmessage;
+  public $allowSimpleRegistYN;
+  public $verifyNameYN;
+  public $payload;
+  public $requestDT;
+  public $expireDT;
+  public $clientCode;
+  public $clientName;
+  public $tmstitle;
+  public $tmsmessage;
 
-	public $subClientName;
-	public $subClientCode;
-	public $viewDT;
-	public $completeDT;
-	public $verifyDT;
+  public $subClientName;
+  public $subClientCode;
+  public $viewDT;
+  public $completeDT;
+  public $verifyDT;
 
   public function fromJsonInfo($jsonInfo)
   {
@@ -524,19 +521,19 @@ class ResultVerifyAuth
 
 class RequestESign
 {
-    public $CallCenterNum;
-    public $CallCenterName;
-	public $Expires_in;
-	public $PayLoad;
-	public $ReceiverBirthDay;
-	public $ReceiverHP;
-	public $ReceiverName;
-	public $SubClientID;
-	public $TMSMessage;
-	public $TMSTitle;
-	public $Token;
-	public $isAllowSimpleRegistYN;
-	public $isVerifyNameYN;
+  public $CallCenterNum;
+  public $CallCenterName;
+  public $Expires_in;
+  public $PayLoad;
+  public $ReceiverBirthDay;
+  public $ReceiverHP;
+  public $ReceiverName;
+  public $SubClientID;
+  public $TMSMessage;
+  public $TMSTitle;
+  public $Token;
+  public $isAllowSimpleRegistYN;
+  public $isVerifyNameYN;
   public $isAppUseYN;
 }
 
@@ -544,30 +541,30 @@ class RequestESign
 class ResultESign
 {
   public $receiptID;
-	public $regDT;
-	public $state;
+  public $regDT;
+  public $state;
 
-	public $expires_in;
-	public $callCenterNum;
-    public $callCenterName;
+  public $expires_in;
+  public $callCenterNum;
+  public $callCenterName;
 
-	public $allowSimpleRegistYN;
-	public $verifyNameYN;
-	public $payload;
-	public $requestDT;
-	public $expireDT;
-	public $clientCode;
-	public $clientName;
-	public $tmstitle;
-	public $tmsmessage;
+  public $allowSimpleRegistYN;
+  public $verifyNameYN;
+  public $payload;
+  public $requestDT;
+  public $expireDT;
+  public $clientCode;
+  public $clientName;
+  public $tmstitle;
+  public $tmsmessage;
 
-	public $subClientName;
-	public $subClientCode;
-	public $viewDT;
-	public $completeDT;
-	public $verifyDT;
-    public $appUseYN;
-    public $tx_id;
+  public $subClientName;
+  public $subClientCode;
+  public $viewDT;
+  public $completeDT;
+  public $verifyDT;
+  public $appUseYN;
+  public $tx_id;
 
   public function fromJsonInfo($jsonInfo)
   {
@@ -596,9 +593,5 @@ class ResultESign
     isset($jsonInfo->verifyDT) ? $this->verifyDT = $jsonInfo->verifyDT : null;
     isset($jsonInfo->appUseYN) ? $this->appUseYN = $jsonInfo->appUseYN : null;
     isset($jsonInfo->tx_id) ? $this->tx_id = $jsonInfo->tx_id : null;
-
-
   }
 }
-
-?>
