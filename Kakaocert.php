@@ -387,7 +387,6 @@ class RequestCMS
   public $ClientUserID;
 
   public $isAppUseYN;
-  public $tx_id;
 }
 
 class ResultCMS
@@ -417,6 +416,7 @@ class ResultCMS
   public $verifyDT;
 
   public $appUseYN;
+  public $tx_id;
 
   public function fromJsonInfo($jsonInfo)
   {
