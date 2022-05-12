@@ -338,12 +338,19 @@ class KakaocertService
     return $this->executeCURL('/SignIdentity/Verify/' . $receiptID, $ClientCode);
   }
 
-  public function verifyCMS($ClientCode, $receiptID)
+  public function verifyCMS($ClientCode, $receiptID, $signature = null)
   {
     if (is_null($receiptID) || empty($receiptID)) {
       throw new KakaocertException('접수아이디가 입력되지 않았습니다.');
     }
-    return $this->executeCURL('/SignDirectDebit/Verify/' . $receiptID, $ClientCode);
+
+    $uri = '/SignDirectDebit/Verify/' . $receiptID;
+
+    if (!is_null($signature) || !empty($signature)) {
+      $uri .= '/' . $signature;
+    }
+
+    return $this->executeCURL($uri, $ClientCode);
   }
 } // end of KakaocertService
 
